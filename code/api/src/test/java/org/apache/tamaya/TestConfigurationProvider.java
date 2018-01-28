@@ -24,9 +24,11 @@ import org.apache.tamaya.spi.ConfigurationContext;
 import org.apache.tamaya.spi.ConfigurationBuilder;
 import org.apache.tamaya.spi.ConfigurationContextBuilder;
 import org.apache.tamaya.spi.ConfigurationProviderSpi;
+import org.mockito.Mockito;
 
 /**
- * Test Configuration class, that is used to testdata the default methods provided by the API.
+ * Test Configuration class, that is used to testdata the default methods
+ * provided by the API.
  */
 @Priority(-1)
 public class TestConfigurationProvider implements ConfigurationProviderSpi {
@@ -60,7 +62,7 @@ public class TestConfigurationProvider implements ConfigurationProviderSpi {
 
     @Override
     public ConfigurationBuilder getConfigurationBuilder() {
-        return null;
+        return Mockito.mock(ConfigurationBuilder.class, Mockito.RETURNS_DEEP_STUBS);
     }
 
     @Override
