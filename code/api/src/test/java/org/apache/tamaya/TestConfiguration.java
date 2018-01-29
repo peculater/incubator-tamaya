@@ -22,7 +22,7 @@ import org.apache.tamaya.spi.ConfigurationContext;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.tamaya.spi.ConfigurationBuilder;
+import java.util.stream.Collectors;
 import org.mockito.Mockito;
 
 /**
@@ -80,14 +80,35 @@ public class TestConfiguration implements Configuration {
         return val;
     }
 
-
     @Override
     public ConfigurationContext getContext() {
-        return null;
+        return Mockito.mock(ConfigurationContext.class);
     }
 
     @Override
     public Map<String, String> getProperties() {
-        return new HashMap<>();
+        // run toString on each value of the (key, value) set in VALUES
+        return VALUES.entrySet().stream().collect(
+                Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().toString()));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TestConfiguration)) {
+            return false;
+        }
+        TestConfiguration that = (TestConfiguration) o;
+        return that.getProperties().equals(this.getProperties());
+    }
+
+    @Override
+    public int hashCode() {
+        return VALUES.hashCode();
+    }
+
 }

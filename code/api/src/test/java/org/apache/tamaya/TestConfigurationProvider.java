@@ -33,7 +33,8 @@ import org.mockito.Mockito;
 @Priority(-1)
 public class TestConfigurationProvider implements ConfigurationProviderSpi {
 
-    private static final Configuration config = new TestConfiguration();
+    private Configuration config = new TestConfiguration();
+    private ConfigurationContext context = Mockito.mock(ConfigurationContext.class);
 
     @Override
     public Configuration getConfiguration() {
@@ -47,12 +48,12 @@ public class TestConfigurationProvider implements ConfigurationProviderSpi {
 
     @Override
     public ConfigurationContext getConfigurationContext() {
-        return config.getContext();
+        return context;
     }
 
     @Override
     public void setConfigurationContext(ConfigurationContext context) {
-        throw new UnsupportedOperationException();
+        this.context = context;
     }
 
     @Override
@@ -67,11 +68,12 @@ public class TestConfigurationProvider implements ConfigurationProviderSpi {
 
     @Override
     public ConfigurationContextBuilder getConfigurationContextBuilder() {
-        return null;
+        return Mockito.mock(ConfigurationContextBuilder.class);
     }
 
     @Override
     public void setConfiguration(Configuration config) {
+        this.config = config;
     }
 
     @Override
