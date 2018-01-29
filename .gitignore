@@ -21,3 +21,4 @@ examples/simple-propertysource/tamaya-example-simple-propertysource.iml
 **/*.checkstyle
 **/*.fbExcludeFilterFile
 
+/code/api/nbproject/
