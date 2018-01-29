@@ -50,16 +50,16 @@ public class TestConfigurationProvider implements ConfigurationProviderSpi {
     public ConfigurationContext getConfigurationContext() {
         return context;
     }
+    
+    public ConfigurationContext getConfigurationContextFromInterface(){
+        return ConfigurationProviderSpi.super.getConfigurationContext();
+    }
 
     @Override
     public void setConfigurationContext(ConfigurationContext context) {
         this.context = context;
     }
 
-    @Override
-    public boolean isConfigurationContextSettable() {
-        return false;
-    }
 
     @Override
     public ConfigurationBuilder getConfigurationBuilder() {
@@ -74,10 +74,5 @@ public class TestConfigurationProvider implements ConfigurationProviderSpi {
     @Override
     public void setConfiguration(Configuration config) {
         this.config = config;
-    }
-
-    @Override
-    public boolean isConfigurationSettable() {
-        return false;
     }
 }
