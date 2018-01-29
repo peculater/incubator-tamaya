@@ -42,7 +42,7 @@ public class ConfigurationProviderTest {
         Configuration result = ConfigurationProvider.createConfiguration(ConfigurationProvider.getConfiguration().getContext());
         assertNotNull(result);
     }
-
+    
     /**
      * Test of getConfigurationContext and setConfigurationContext method, of
      * class ConfigurationProvider.
