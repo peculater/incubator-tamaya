@@ -22,3 +22,4 @@ examples/simple-propertysource/tamaya-example-simple-propertysource.iml
 **/*.fbExcludeFilterFile
 
 /code/api/nbproject/
+/code/core/nbproject/
