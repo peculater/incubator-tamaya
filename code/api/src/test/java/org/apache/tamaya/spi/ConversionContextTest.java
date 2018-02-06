@@ -42,7 +42,7 @@ public class ConversionContextTest {
     public void getSetKey() throws Exception {
         ConversionContext ctx = new ConversionContext.Builder("getKey", TypeLiteral.of(String.class)).build();
         assertEquals("getKey", ctx.getKey());
-        ctx = new ConversionContext.Builder(TypeLiteral.of(String.class)).setKey("setKey").build();
+        ctx = new ConversionContext.Builder("getKey", TypeLiteral.of(String.class)).setKey("setKey").build();
         assertEquals("setKey", ctx.getKey());
     }
 
