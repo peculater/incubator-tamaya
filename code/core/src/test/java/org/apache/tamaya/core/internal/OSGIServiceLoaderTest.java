@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +77,7 @@ public class OSGIServiceLoaderTest {
         MockBundle startedBundle = new MockBundle();
         startedBundle.setState(Bundle.ACTIVE);
         startedBundle.setBundleId(1);
+        startedBundle.setBundleContext(mockBundleContext);
         mockBundleContext.installBundle(startedBundle);
         OSGIServiceLoader instance = new OSGIServiceLoader(mockBundleContext);
         Set<Bundle> result = instance.getResourceBundles();
@@ -91,36 +93,45 @@ public class OSGIServiceLoaderTest {
     public void testBundleChanged() throws Exception {
         //Set up mocks
         Set<Bundle> resultBundles;
+        MockBundleContext mockBundleContext = new MockBundleContext();
         MockBundle startedBundle = new MockBundle();
         startedBundle.setState(Bundle.ACTIVE);
         startedBundle.setBundleId(1);
+        startedBundle.setBundleContext(mockBundleContext);
         MockBundle stoppedBundle = new MockBundle();
         stoppedBundle.setState(Bundle.INSTALLED);
         stoppedBundle.setBundleId(2);
+        stoppedBundle.setBundleContext(mockBundleContext);
         MockBundle flipBundle = new MockBundle();
         flipBundle.setState(Bundle.INSTALLED);
         flipBundle.setBundleId(3);
-        MockBundleContext mockBundleContext = new MockBundleContext();
+        flipBundle.setBundleContext(mockBundleContext);
         mockBundleContext.installBundle(startedBundle);
         mockBundleContext.installBundle(stoppedBundle);
         mockBundleContext.installBundle(flipBundle);
 
         //Default case
+        mockBundleContext.setServiceCount(0);
         OSGIServiceLoader instance = new OSGIServiceLoader(mockBundleContext);
         resultBundles = instance.getResourceBundles();
         assertEquals(1, resultBundles.size());
+        assertEquals(2, mockBundleContext.getServiceCount());
 
         //After start
+        mockBundleContext.setServiceCount(0);
         BundleEvent startedEvent = new BundleEvent(BundleEvent.STARTED, flipBundle);
         instance.bundleChanged(startedEvent);
         resultBundles = instance.getResourceBundles();
         assertEquals(2, resultBundles.size());
+        assertEquals(2, mockBundleContext.getServiceCount());
 
         //After stop
+        mockBundleContext.setServiceCount(0);
         BundleEvent stoppedEvent = new BundleEvent(BundleEvent.STOPPED, flipBundle);
         instance.bundleChanged(stoppedEvent);
         resultBundles = instance.getResourceBundles();
         assertEquals(1, resultBundles.size());
+        assertEquals(0, mockBundleContext.getServiceCount());
     }
 
     /**
@@ -200,19 +211,32 @@ public class OSGIServiceLoaderTest {
             throw new UnsupportedOperationException("Not supported.");
         }
 
+        int serviceCount = 0;
+
+        public int getServiceCount() {
+            return serviceCount;
+        }
+
+        public void setServiceCount(int serviceCount) {
+            this.serviceCount = serviceCount;
+        }
+        
         @Override
         public ServiceRegistration<?> registerService(String[] strings, Object o, Dictionary<String, ?> dctnr) {
-            throw new UnsupportedOperationException("Not supported.");
+            serviceCount++;
+            return null;
         }
 
         @Override
         public ServiceRegistration<?> registerService(String string, Object o, Dictionary<String, ?> dctnr) {
-            throw new UnsupportedOperationException("Not supported.");
+            serviceCount++;
+            return null;
         }
 
         @Override
         public <S> ServiceRegistration<S> registerService(Class<S> type, S s, Dictionary<String, ?> dctnr) {
-            throw new UnsupportedOperationException("Not supported.");
+            serviceCount++;
+            return null;
         }
 
         @Override
@@ -232,7 +256,7 @@ public class OSGIServiceLoaderTest {
 
         @Override
         public <S> ServiceReference<S> getServiceReference(Class<S> type) {
-            throw new UnsupportedOperationException("Not supported.");
+            return null;
         }
 
         @Override
@@ -316,7 +340,7 @@ public class OSGIServiceLoaderTest {
 
         @Override
         public Dictionary<String, String> getHeaders() {
-            throw new UnsupportedOperationException("Not supported.");
+            return new Hashtable<>();
         }
 
         private long bundleId = 1L;
@@ -357,7 +381,7 @@ public class OSGIServiceLoaderTest {
 
         @Override
         public Dictionary<String, String> getHeaders(String string) {
-            throw new UnsupportedOperationException("Not supported.");
+            return new Hashtable<>();
         }
 
         @Override
@@ -367,7 +391,10 @@ public class OSGIServiceLoaderTest {
 
         @Override
         public Class<?> loadClass(String string) throws ClassNotFoundException {
-            throw new UnsupportedOperationException("Not supported.");
+            if (string.contains("org.something.else") || string.endsWith("/")) {
+                throw new UnsupportedOperationException("Requested class that should not be requested: " + string);
+            }
+            return String.class;
         }
 
         @Override
@@ -378,7 +405,7 @@ public class OSGIServiceLoaderTest {
         @Override
         public Enumeration<String> getEntryPaths(String string) {
             Vector<String> v = new Vector<>();
-            v.add("META-INF/services/");
+            v.add("META-INF/services/" + "someslash/");
             v.add("META-INF/services/" + "org.apache.tamaya");
             v.add("META-INF/services/" + "org.something.else");
             return v.elements();
@@ -386,11 +413,17 @@ public class OSGIServiceLoaderTest {
 
         @Override
         public URL getEntry(String string) {
-            try {
-                return new URL("file://MockBundle.getEntry");
-            } catch (MalformedURLException e) {
-                return null;
+            if (string.equals("META-INF/services/")) {
+                try {
+                    return new URL("file:///");
+                } catch (MalformedURLException ex) {
+                    return null;
+                }
             }
+            if (string.contains("org.something.else") || string.endsWith("/")) {
+                throw new UnsupportedOperationException("Requested entry that should not be requested: " + string);
+            }
+            return getClass().getClassLoader().getResource("osgi-entry.txt");
         }
 
         @Override
@@ -403,9 +436,15 @@ public class OSGIServiceLoaderTest {
             throw new UnsupportedOperationException("Not supported.");
         }
 
+        private BundleContext bundleContext = new MockBundleContext();
+
         @Override
         public BundleContext getBundleContext() {
-            throw new UnsupportedOperationException("Not supported.");
+            return bundleContext;
+        }
+
+        public void setBundleContext(BundleContext bundleContext) {
+            this.bundleContext = bundleContext;
         }
 
         @Override
@@ -415,7 +454,7 @@ public class OSGIServiceLoaderTest {
 
         @Override
         public Version getVersion() {
-            throw new UnsupportedOperationException("Not supported.");
+            return new Version(0, 0, 1);
         }
 
         @Override
