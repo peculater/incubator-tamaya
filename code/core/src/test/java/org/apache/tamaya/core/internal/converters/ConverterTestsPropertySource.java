@@ -225,7 +225,7 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "min", getName());
             case "tests.converter.short.max":
                 return PropertyValue.of(key, "MAX_Value", getName());
-            // BigDecimal
+            // BigDecimal & BigInteger
             case "tests.converter.bd.decimal":
                 return PropertyValue.of(key, "101", getName());
             case "tests.converter.bd.float":
@@ -238,6 +238,19 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "0x2F", getName());
             case "tests.converter.bd.hex.upperX":
                 return PropertyValue.of(key, "0X3F", getName());
+            case "tests.converter.bd.hex.negLowerX":
+                return PropertyValue.of(key, "-0x2F", getName());
+            case "tests.converter.bd.hex.negUpperX":
+                return PropertyValue.of(key, "-0X3F", getName());
+            case "tests.converter.bd.hex.badX":
+                return PropertyValue.of(key, "0X3G2", getName());
+            case "tests.converter.bd.hex.negBadX":
+                return PropertyValue.of(key, "-0X3G2", getName());
+            case "tests.converter.bd.hex.subTenX":
+                return PropertyValue.of(key, "0XFFFFFF", getName());
+            case "tests.converter.bd.hex.negSubTenX":
+                return PropertyValue.of(key, "-0X0107", getName());
+           
         }
         return null;
     }
