@@ -145,7 +145,7 @@ public class ConversionContext {
         /** The injection target (only set with injection used). */
         private AnnotatedElement annotatedElement;
         /** The ordered list of formats tried. */
-        private final Set<String> supportedFormats = new HashSet<>();
+        private final List<String> supportedFormats = new ArrayList<>();
 
         /**
          * Creates a new Builder instance.
