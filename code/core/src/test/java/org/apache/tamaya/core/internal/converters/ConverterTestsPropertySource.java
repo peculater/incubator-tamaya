@@ -215,6 +215,8 @@ public class ConverterTestsPropertySource implements PropertySource {
                 return PropertyValue.of(key, "positive_infinity", getName());
             case "tests.converter.float.ni":
                 return PropertyValue.of(key, "Negative_Infinity", getName());
+            case "tests.converter.float.invalid":
+                return PropertyValue.of(key, "invalid", getName());
             // Integer
             case "tests.converter.integer.decimal":
                 return PropertyValue.of(key, "101", getName());
