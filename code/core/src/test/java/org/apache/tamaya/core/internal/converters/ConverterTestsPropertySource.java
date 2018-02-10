@@ -245,6 +245,8 @@ public class ConverterTestsPropertySource implements PropertySource {
                 return PropertyValue.of(key, "min", getName());
             case "tests.converter.long.max":
                 return PropertyValue.of(key, "MAX_Value", getName());
+            case "tests.converter.long.invalid":
+                return PropertyValue.of(key, "invalid", getName());
             // Short
             case "tests.converter.short.decimal":
                 return PropertyValue.of(key, "101", getName());
@@ -258,6 +260,8 @@ public class ConverterTestsPropertySource implements PropertySource {
                 return PropertyValue.of(key, "min", getName());
             case "tests.converter.short.max":
                 return PropertyValue.of(key, "MAX_Value", getName());
+            case "tests.converter.short.invalid":
+                return PropertyValue.of(key, "invalid", getName());
             // BigDecimal & BigInteger
             case "tests.converter.bd.decimal":
                 return PropertyValue.of(key, "101", getName());
