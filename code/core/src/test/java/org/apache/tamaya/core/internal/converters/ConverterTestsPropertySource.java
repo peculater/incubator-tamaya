@@ -113,6 +113,22 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "   f      ", getName());
             case "tests.converter.char.f-numeric":
                 return PropertyValue.of(key, "101", getName());
+            case "tests.converter.char.single-quote":
+                return PropertyValue.of(key, "'", getName());
+            case "tests.converter.char.two-single-quotes":
+                return PropertyValue.of(key, "''", getName());
+            case "tests.converter.char.three-single-quotes":
+                return PropertyValue.of(key, "'''", getName());
+            case "tests.converter.char.invalid":
+                return PropertyValue.of(key, "invalid", getName());
+            case "tests.converter.char.quoted-invalid":
+                return PropertyValue.of(key, "'invalid'", getName());
+            case "tests.converter.char.あ":
+                return PropertyValue.of(key, "あ", getName());
+            case "tests.converter.char.กขฃคฅฆงจฉช":
+                return PropertyValue.of(key, "กขฃคฅฆงจฉช", getName());
+                
+                
             // currency
             case "tests.converter.currency.code1":
                 return PropertyValue.of(key, "CHF", getName());
