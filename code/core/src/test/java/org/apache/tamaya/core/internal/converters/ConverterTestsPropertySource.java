@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * Test Property Source used by converter tests.
  */
-public class ConverterTestsPropertySource implements PropertySource{
+public class ConverterTestsPropertySource implements PropertySource {
 
     @Override
     public int getOrdinal() {
@@ -35,13 +35,13 @@ public class ConverterTestsPropertySource implements PropertySource{
     }
 
     @Override
-    public String getName(){
+    public String getName() {
         return "ConverterTestsPropertySource";
     }
 
     @Override
     public PropertyValue get(String key) {
-        switch(key){
+        switch (key) {
             // Bytes
             case "tests.converter.byte.decimal":
                 return PropertyValue.of(key, "101", getName());
@@ -127,8 +127,7 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "あ", getName());
             case "tests.converter.char.กขฃคฅฆงจฉช":
                 return PropertyValue.of(key, "กขฃคฅฆงจฉช", getName());
-                
-                
+
             // currency
             case "tests.converter.currency.code1":
                 return PropertyValue.of(key, "CHF", getName());
@@ -156,6 +155,14 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "DE  ", getName());
             case "tests.converter.currency.code-locale4":
                 return PropertyValue.of(key, "  DE  ", getName());
+            case "tests.converter.currency.code-locale-twopart":
+                return PropertyValue.of(key, "jp_JP", getName());
+            case "tests.converter.currency.code-locale-threepart":
+                return PropertyValue.of(key, "jp_JP_JP", getName());
+            case "tests.converter.currency.code-locale-fourpart":
+                return PropertyValue.of(key, "jp_JP_JP_JP", getName());
+            case "tests.converter.currency.invalid":
+                return PropertyValue.of(key, "invalid", getName());
             //double
             case "tests.converter.double.decimal":
                 return PropertyValue.of(key, "1.23456789", getName());
@@ -270,7 +277,7 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "0XFFFFFF", getName());
             case "tests.converter.bd.hex.negSubTenX":
                 return PropertyValue.of(key, "-0X0107", getName());
-           
+
         }
         return null;
     }
