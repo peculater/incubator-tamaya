@@ -18,7 +18,6 @@
  */
 package org.apache.tamaya.core.internal.converters;
 
-import java.math.BigInteger;
 import org.apache.tamaya.ConfigException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,7 +28,6 @@ import org.apache.tamaya.Configuration;
 import org.apache.tamaya.ConfigurationProvider;
 import org.apache.tamaya.TypeLiteral;
 import org.apache.tamaya.spi.ConversionContext;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 

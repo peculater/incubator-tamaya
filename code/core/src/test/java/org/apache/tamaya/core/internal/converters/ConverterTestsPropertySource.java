@@ -55,6 +55,8 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "min", getName());
             case "tests.converter.byte.max":
                 return PropertyValue.of(key, "MAX_Value", getName());
+            case "tests.converter.byte.invalid":
+                return PropertyValue.of(key, "invalid", getName());
             // Boolean
             case "tests.converter.boolean.y1":
                 return PropertyValue.of(key, "y", getName());
