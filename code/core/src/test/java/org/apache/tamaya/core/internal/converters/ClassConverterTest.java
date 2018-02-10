@@ -18,13 +18,11 @@
  */
 package org.apache.tamaya.core.internal.converters;
 
-import java.lang.reflect.Field;
 import org.apache.tamaya.TypeLiteral;
 import org.apache.tamaya.spi.ConversionContext;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.Vector;
 
 import static org.junit.Assert.*;
 
