@@ -18,11 +18,13 @@
  */
 package org.apache.tamaya.core.internal.converters;
 
+import java.lang.reflect.Field;
 import org.apache.tamaya.TypeLiteral;
 import org.apache.tamaya.spi.ConversionContext;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Vector;
 
 import static org.junit.Assert.*;
 
@@ -63,5 +65,20 @@ public class ClassConverterTest {
         ClassConverter converter = new ClassConverter();
         assertNull(converter.convert("", context));
         assertNull(converter.convert(null, context));
+    }
+
+    @Test
+    public void callToConvertAddsMoreSupportedFormatsToTheContext() throws Exception {
+        ConversionContext localcontext = new ConversionContext.Builder(TypeLiteral.of(Class.class)).build();
+        ClassConverter converter = new ClassConverter();
+        converter.convert("", localcontext);
+
+        assertTrue(localcontext.getSupportedFormats().contains("<fullyQualifiedClassName> (ClassConverter)"));
+    }
+
+    @Test
+    public void testHashCode() {
+        ClassConverter instance = new ClassConverter();
+        assertEquals(ClassConverter.class.hashCode(), instance.hashCode());
     }
 }
