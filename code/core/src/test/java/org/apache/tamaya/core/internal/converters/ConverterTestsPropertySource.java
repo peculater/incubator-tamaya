@@ -230,6 +230,8 @@ public class ConverterTestsPropertySource implements PropertySource {
                 return PropertyValue.of(key, "min", getName());
             case "tests.converter.integer.max":
                 return PropertyValue.of(key, "MAX_Value", getName());
+            case "tests.converter.integer.invalid":
+                return PropertyValue.of(key, "invalid", getName());
             // Long
             case "tests.converter.long.decimal":
                 return PropertyValue.of(key, "101", getName());
