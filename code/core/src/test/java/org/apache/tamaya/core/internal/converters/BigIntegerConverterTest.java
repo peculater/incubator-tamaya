@@ -145,12 +145,10 @@ public class BigIntegerConverterTest {
     @Test
     public void callToConvertAddsMoreSupportedFormatsToTheContext() throws Exception {
         ConversionContext context = new ConversionContext.Builder(TypeLiteral.of(BigInteger.class)).build();
-
         BigIntegerConverter converter = new BigIntegerConverter();
         BigInteger value = converter.convert("", context);
 
         assertThat(value).isNull();
-        System.out.println(context.getSupportedFormats().toString());
         assertTrue(context.getSupportedFormats().contains("<bigint> -> new BigInteger(bigint) (BigIntegerConverter)"));
     }
 

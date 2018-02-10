@@ -96,6 +96,8 @@ public class ConverterTestsPropertySource implements PropertySource{
                 return PropertyValue.of(key, "f", getName());
             case "tests.converter.boolean.f2":
                 return PropertyValue.of(key, "F", getName());
+            case "tests.converter.boolean.invalid":
+                return PropertyValue.of(key, "invalid", getName());
             // Character
             case "tests.converter.char.f":
                 return PropertyValue.of(key, "f", getName());
