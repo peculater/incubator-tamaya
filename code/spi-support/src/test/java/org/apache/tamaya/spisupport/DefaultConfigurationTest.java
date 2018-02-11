@@ -36,7 +36,7 @@ public class DefaultConfigurationTest {
      */
     @Test(expected = NullPointerException.class)
     public void getDoesNotAcceptNull() {
-        DefaultConfiguration c =  new DefaultConfiguration(new DummyConfigurationContext());
+        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
 
         c.get(null);
     }
@@ -44,8 +44,8 @@ public class DefaultConfigurationTest {
     /**
      * Tests for get(String, Class)
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Test(expected = NullPointerException.class)
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Test(expected = NullPointerException.class)
     public void getDoesNotAcceptNullForClassTargetType() {
         DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
 
@@ -57,9 +57,9 @@ public class DefaultConfigurationTest {
      */
     @Test(expected = NullPointerException.class)
     public void getDoesNotAcceptNullForTypeLiteralTargetType() {
-        DefaultConfiguration c =  new DefaultConfiguration(new DummyConfigurationContext());
+        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
 
-        c.get("a", (TypeLiteral<?>)null);
+        c.get("a", (TypeLiteral<?>) null);
     }
 
     /**
@@ -79,12 +79,12 @@ public class DefaultConfigurationTest {
         assertNull(c.getOrDefault("a", String.class, null));
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	@Test(expected = NullPointerException.class)
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Test(expected = NullPointerException.class)
     public void getOrDefaultDoesNotAcceptNullAsTargetTypeForThreeParameterVariant() {
         DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
 
-        c.getOrDefault("a", (Class)null, "b");
+        c.getOrDefault("a", (Class) null, "b");
     }
 
     /**
@@ -124,7 +124,7 @@ public class DefaultConfigurationTest {
     @Test
     public void getOrDefaultDoesAcceptNullAsDefaultValueForTwoParameterVariantDefaultValueIsSecond() {
         DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
-       assertNull(c.getOrDefault("a", null));
+        assertNull(c.getOrDefault("a", null));
     }
 
     @Test(expected = NullPointerException.class)
@@ -154,6 +154,7 @@ public class DefaultConfigurationTest {
     }
 
     public static class DummyConfigurationContext implements ConfigurationContext {
+
         @Override
         public void addPropertySources(PropertySource... propertySources) {
             throw new RuntimeException("Method should be never called in this test");

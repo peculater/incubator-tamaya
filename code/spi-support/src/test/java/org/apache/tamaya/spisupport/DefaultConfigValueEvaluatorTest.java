@@ -21,12 +21,7 @@ package org.apache.tamaya.spisupport;
 import java.util.Map;
 import org.apache.tamaya.Configuration;
 import org.apache.tamaya.ConfigurationProvider;
-import org.apache.tamaya.spi.ConfigurationContext;
 import org.apache.tamaya.spi.PropertyValue;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
