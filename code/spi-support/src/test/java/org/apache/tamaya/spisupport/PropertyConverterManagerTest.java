@@ -20,6 +20,7 @@ package org.apache.tamaya.spisupport;
 
 
 
+import java.lang.reflect.Method;
 import org.apache.tamaya.ConfigurationProvider;
 import org.apache.tamaya.spi.ConversionContext;
 import org.apache.tamaya.spi.PropertyConverter;
@@ -28,10 +29,13 @@ import org.junit.Test;
 
 import java.util.List;
 
+
+import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import org.junit.Ignore;
 
 public class PropertyConverterManagerTest {
 
@@ -158,6 +162,48 @@ public class PropertyConverterManagerTest {
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(C.class));
         assertThat(((C)result).getInValue(), equalTo("testTransitiveInterfaceMapping2"));
+    }
+    
+    @Ignore
+    @Test
+    public void testMapBoxedType() throws Exception{
+        PropertyConverterManager manager = new PropertyConverterManager(false);        
+        Method method = PropertyConverterManager.class.getDeclaredMethod("mapBoxedType", TypeLiteral.class);
+        method.setAccessible(true);
+        
+        assertEquals(TypeLiteral.of(Integer.class),
+                method.invoke(manager, TypeLiteral.of(int.class)));
+        assertEquals(TypeLiteral.of(Short.class),
+                method.invoke(manager, TypeLiteral.of(short.class)));
+        assertEquals(TypeLiteral.of(Byte.class),
+                method.invoke(manager, TypeLiteral.of(byte.class)));
+        assertEquals(TypeLiteral.of(Long.class),
+                method.invoke(manager, TypeLiteral.of(long.class)));
+        assertEquals(TypeLiteral.of(Boolean.class),
+                method.invoke(manager, TypeLiteral.of(boolean.class)));
+        assertEquals(TypeLiteral.of(Character.class),
+                method.invoke(manager, TypeLiteral.of(char.class)));
+        assertEquals(TypeLiteral.of(Float.class),
+                method.invoke(manager, TypeLiteral.of(float.class)));
+        assertEquals(TypeLiteral.of(Double.class),
+                method.invoke(manager, TypeLiteral.of(double.class)));
+        
+        assertEquals(TypeLiteral.of(Integer[].class),
+                method.invoke(manager, TypeLiteral.of(int[].class)));
+        assertEquals(TypeLiteral.of(Short[].class),
+                method.invoke(manager, TypeLiteral.of(short[].class)));
+        assertEquals(TypeLiteral.of(Byte[].class),
+                method.invoke(manager, TypeLiteral.of(byte[].class)));
+        assertEquals(TypeLiteral.of(Long[].class),
+                method.invoke(manager, TypeLiteral.of(long[].class)));
+        assertEquals(TypeLiteral.of(Boolean[].class),
+                method.invoke(manager, TypeLiteral.of(boolean[].class)));
+        assertEquals(TypeLiteral.of(Character[].class),
+                method.invoke(manager, TypeLiteral.of(char[].class)));
+        assertEquals(TypeLiteral.of(Float[].class),
+                method.invoke(manager, TypeLiteral.of(float[].class)));
+        assertEquals(TypeLiteral.of(Double[].class),
+                method.invoke(manager, TypeLiteral.of(double[].class)));        
     }
 
     public static class MyType {
