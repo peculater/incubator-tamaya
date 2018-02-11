@@ -18,20 +18,13 @@
  */
 package org.apache.tamaya.spisupport;
 
-
-
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import org.apache.tamaya.ConfigurationProvider;
 import org.apache.tamaya.spi.ConversionContext;
 import org.apache.tamaya.spi.PropertyConverter;
 import org.apache.tamaya.TypeLiteral;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.stream.IntStream;
-
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -50,7 +43,7 @@ public class PropertyConverterManagerTest {
         PropertyConverterManager manager = new PropertyConverterManager(true);
 
         assertThat(manager.isTargetTypeSupported(TypeLiteral.of(MyType.class)),
-                   is(true));
+                is(true));
     }
 
     @Test
@@ -58,7 +51,7 @@ public class PropertyConverterManagerTest {
         PropertyConverterManager manager = new PropertyConverterManager(true);
 
         List<PropertyConverter<MyType>> converters = manager.getPropertyConverters(
-                (TypeLiteral)TypeLiteral.of(MyType.class));
+                (TypeLiteral) TypeLiteral.of(MyType.class));
 
         assertThat(converters, hasSize(1));
 
@@ -68,11 +61,11 @@ public class PropertyConverterManagerTest {
 
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(MyType.class));
-        assertThat(((MyType)result).getValue(), equalTo("IN"));
+        assertThat(((MyType) result).getValue(), equalTo("IN"));
     }
 
     @Test
-    public void testDirectConverterMapping(){
+    public void testDirectConverterMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
         List<PropertyConverter<C>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(C.class)));
         assertThat(converters, hasSize(1));
@@ -86,7 +79,7 @@ public class PropertyConverterManagerTest {
     }
 
     @Test
-    public void testDirectSuperclassConverterMapping(){
+    public void testDirectSuperclassConverterMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
         List<PropertyConverter<B>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(B.class)));
         assertThat(converters, hasSize(1));
@@ -98,11 +91,11 @@ public class PropertyConverterManagerTest {
 
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(C.class));
-        assertThat(((C)result).getInValue(), equalTo("testDirectSuperclassConverterMapping"));
+        assertThat(((C) result).getInValue(), equalTo("testDirectSuperclassConverterMapping"));
     }
 
     @Test
-    public void testMultipleConverterLoad(){
+    public void testMultipleConverterLoad() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
         List<PropertyConverter<B>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(B.class)));
         assertThat(converters, hasSize(1));
@@ -112,7 +105,7 @@ public class PropertyConverterManagerTest {
     }
 
     @Test
-    public void testTransitiveSuperclassConverterMapping(){
+    public void testTransitiveSuperclassConverterMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
         List<PropertyConverter<A>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(A.class)));
         assertThat(converters, hasSize(1));
@@ -122,11 +115,11 @@ public class PropertyConverterManagerTest {
 
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(C.class));
-        assertThat(((C)result).getInValue(), equalTo("testTransitiveSuperclassConverterMapping"));
+        assertThat(((C) result).getInValue(), equalTo("testTransitiveSuperclassConverterMapping"));
     }
 
     @Test
-    public void testDirectInterfaceMapping(){
+    public void testDirectInterfaceMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
         List<PropertyConverter<Readable>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(Readable.class)));
         assertThat(converters, hasSize(1));
@@ -136,11 +129,11 @@ public class PropertyConverterManagerTest {
 
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(C.class));
-        assertThat(((C)result).getInValue(), equalTo("testDirectInterfaceMapping"));
+        assertThat(((C) result).getInValue(), equalTo("testDirectInterfaceMapping"));
     }
 
     @Test
-    public void testTransitiveInterfaceMapping1(){
+    public void testTransitiveInterfaceMapping1() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
         List<PropertyConverter<Runnable>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(Runnable.class)));
         assertThat(converters, hasSize(1));
@@ -150,11 +143,11 @@ public class PropertyConverterManagerTest {
 
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(C.class));
-        assertThat(((C)result).getInValue(), equalTo("testTransitiveInterfaceMapping1"));
+        assertThat(((C) result).getInValue(), equalTo("testTransitiveInterfaceMapping1"));
     }
 
     @Test
-    public void testTransitiveInterfaceMapping2(){
+    public void testTransitiveInterfaceMapping2() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
         List<PropertyConverter<AutoCloseable>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(AutoCloseable.class)));
         assertThat(converters, hasSize(1));
@@ -164,35 +157,62 @@ public class PropertyConverterManagerTest {
 
         assertThat(result, notNullValue());
         assertThat(result, instanceOf(C.class));
-        assertThat(((C)result).getInValue(), equalTo("testTransitiveInterfaceMapping2"));
+        assertThat(((C) result).getInValue(), equalTo("testTransitiveInterfaceMapping2"));
     }
-    
-    //@Ignore
+
     @Test
-    public void testMapBoxedType() throws Exception{
-        PropertyConverterManager manager = new PropertyConverterManager(false);   
+    public void testCreateDefaultPropertyConverter() {
+        PropertyConverterManager manager = new PropertyConverterManager(false);
+        PropertyConverter pc = manager.createDefaultPropertyConverter(TypeLiteral.of(MyEnum.class));
+        assertTrue(pc instanceof EnumConverter);
+    }
+
+    @Test
+    public void testGetFactoryMethod() throws Exception {
+        PropertyConverterManager manager = new PropertyConverterManager(false);
+        Method getFactoryMethod = PropertyConverterManager.class.getDeclaredMethod("getFactoryMethod", new Class[]{Class.class, String[].class});
+        getFactoryMethod.setAccessible(true);
+
+        Method foundMethod = (Method) getFactoryMethod.invoke(manager, MyType.class, new String[]{"instanceOf"});
+        assertEquals("instanceOf", foundMethod.getName());
         
-        Class[] boxed = new Class[] { 
+        Method staticOf = (Method) getFactoryMethod.invoke(manager, MyType.class, new String[]{"of"});
+        assertEquals("of", staticOf.getName());
+
+        Method notFoundMethod = (Method) getFactoryMethod.invoke(manager, MyType.class, new String[]{"missingMethod"});
+        assertNull(notFoundMethod);
+
+        Method wrongSignature = (Method) getFactoryMethod.invoke(manager, MyType.class, new String[]{"getValue"});
+        assertNull(wrongSignature);
+    }
+
+    @Ignore
+    @Test
+    public void testMapBoxedType() throws Exception {
+        PropertyConverterManager manager = new PropertyConverterManager(false);
+
+        Class[] boxed = new Class[]{
             Integer[].class, Short[].class, Byte[].class, Long[].class,
             Boolean[].class, Character[].class, Float[].class, Double[].class
         };
-        Class[] primitive = new Class[] {
+        Class[] primitive = new Class[]{
             int[].class, short[].class, byte[].class, long[].class,
             boolean[].class, char[].class, float[].class, double[].class
         };
-        
+
         Method method = PropertyConverterManager.class.getDeclaredMethod("mapBoxedType", TypeLiteral.class);
         method.setAccessible(true);
-        
-        for (int i=0; i < boxed.length; i++){
+
+        for (int i = 0; i < boxed.length; i++) {
             assertEquals(TypeLiteral.of(boxed[i]),
-                method.invoke(manager, TypeLiteral.of(primitive[i])));
+                    method.invoke(manager, TypeLiteral.of(primitive[i])));
             assertEquals(TypeLiteral.of(boxed[i].getComponentType()),
-                method.invoke(manager, TypeLiteral.of(primitive[i].getComponentType())));
+                    method.invoke(manager, TypeLiteral.of(primitive[i].getComponentType())));
         }
     }
 
     public static class MyType {
+
         private final String typeValue;
 
         private MyType(String value) {
@@ -207,6 +227,14 @@ public class PropertyConverterManagerTest {
             return typeValue;
         }
 
+        public String instanceOf(String input) {
+            return input;
+        }
+
+    }
+
+    private enum MyEnum {
+        A, B, C
     }
 
 }
