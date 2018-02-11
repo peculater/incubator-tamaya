@@ -287,6 +287,8 @@ public class ConverterTestsPropertySource implements PropertySource {
                 return PropertyValue.of(key, "0XFFFFFF", getName());
             case "tests.converter.bd.hex.negSubTenX":
                 return PropertyValue.of(key, "-0X0107", getName());
+            case "tests.converter.bd.invalid":
+                return PropertyValue.of(key, "invalid", getName());
 
         }
         return null;
