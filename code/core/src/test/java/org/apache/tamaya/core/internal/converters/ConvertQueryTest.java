@@ -30,7 +30,6 @@ import static org.junit.Assert.*;
  */
 public class ConvertQueryTest {
 
-
     /**
      * Test of query method, of class ConvertQuery.
      */
@@ -41,30 +40,41 @@ public class ConvertQueryTest {
         Integer result = converter.query(config);
         assertEquals(101, result.longValue());
     }
-    
+
+    /**
+     * Test of query method, of class ConvertQuery.
+     */
+    @Test
+    public void testConfigUsingIntegerQuery() {
+        Configuration config = ConfigurationProvider.getConfiguration();
+        ConvertQuery<Integer> converter = new ConvertQuery<>("101", TypeLiteral.of(Integer.class));
+        Integer result = config.query(converter);
+        assertEquals(101, result.longValue());
+    }
+
     /**
      * Test of query method, of class ConvertQuery.
      */
     @Test
     public void testNonGenericQuery() {
         Configuration config = ConfigurationProvider.getConfiguration();
-        
-        Integer intResult =(Integer) new ConvertQuery("101", TypeLiteral.of(Integer.class)).query(config);
+
+        Integer intResult = (Integer) new ConvertQuery("101", TypeLiteral.of(Integer.class)).query(config);
         assertEquals(101, intResult.longValue());
-        
+
         Boolean booleanResult = (Boolean) new ConvertQuery("true", TypeLiteral.of(Boolean.class)).query(config);
         assertEquals(Boolean.TRUE, booleanResult);
     }
-    
+
     /**
      * Test of query method, of class ConvertQuery.
      */
     @Test
     public void testNullWithoutSuccess() {
         Configuration config = ConfigurationProvider.getConfiguration();
-        
-        Integer intResult =(Integer) new ConvertQuery("invalid", TypeLiteral.of(Integer.class)).query(config);;
+
+        Integer intResult = (Integer) new ConvertQuery("invalid", TypeLiteral.of(Integer.class)).query(config);
         assertNull(intResult);
     }
-    
+
 }

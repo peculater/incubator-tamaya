@@ -18,7 +18,6 @@
  */
 package org.apache.tamaya.core.internal.converters;
 
-import java.time.LocalDate;
 import org.apache.tamaya.spi.ConversionContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +34,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class OffsetTimeConverterTest {
+
     @Mock
     ConversionContext context;
 
