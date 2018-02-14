@@ -59,7 +59,6 @@ public class CharConverterTest {
 
     }
 
-    @Ignore
     @Test
     public void testConvert_Character_SingleQuote() throws Exception {
         Configuration config = ConfigurationProvider.getConfiguration();

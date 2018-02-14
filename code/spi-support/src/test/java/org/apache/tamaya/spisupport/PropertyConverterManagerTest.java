@@ -31,7 +31,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
 
 public class PropertyConverterManagerTest {
 
@@ -186,7 +186,6 @@ public class PropertyConverterManagerTest {
         assertNull(wrongSignature);
     }
 
-    @Ignore
     @Test
     public void testMapBoxedType() throws Exception {
         PropertyConverterManager manager = new PropertyConverterManager(false);
