@@ -18,14 +18,17 @@
  */
 package org.apache.tamaya.spisupport.propertysource;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import org.apache.tamaya.spisupport.propertysource.EnvironmentPropertySource;
 import org.apache.tamaya.spi.PropertyValue;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Tests for {@link EnvironmentPropertySource}.
@@ -33,6 +36,55 @@ import static org.junit.Assert.assertTrue;
 public class EnvironmentPropertySourceTest {
 
     private final EnvironmentPropertySource envPropertySource = new EnvironmentPropertySource();
+
+    @Test
+    public void testConstructionProperties() throws IOException {
+        StringWriter stringBufferWriter = new StringWriter();
+        System.getProperties().store(stringBufferWriter, null);
+        String before = stringBufferWriter.toString();
+        
+        try{
+            EnvironmentPropertySource environmentSource = new EnvironmentPropertySource();
+            assertFalse(environmentSource.isDisabled());
+            
+            System.setProperty("tamaya.envprops.prefix", "fakeprefix");
+            System.setProperty("tamaya.envprops.disable", "true");
+            environmentSource = new EnvironmentPropertySource();
+            //assertEquals("fakeprefix", environmentSource.getPrefix());
+            assertTrue(environmentSource.isDisabled());
+            assertNull(environmentSource.get(System.getenv().entrySet().iterator().next().getKey()));
+            assertTrue(environmentSource.getName().contains("(disabled)"));
+            assertTrue(environmentSource.getProperties().isEmpty());
+            assertTrue(environmentSource.toString().contains("disabled=true"));
+            
+            System.getProperties().clear();
+            System.getProperties().load(new StringReader(before));
+            System.setProperty("tamaya.defaults.disable", "true");
+            environmentSource = new EnvironmentPropertySource();
+            assertTrue(environmentSource.isDisabled());
+            
+            System.getProperties().clear();
+            System.getProperties().load(new StringReader(before));
+            System.setProperty("tamaya.envprops.disable", "");
+            environmentSource = new EnvironmentPropertySource();
+            assertFalse(environmentSource.isDisabled());
+            
+            System.getProperties().clear();
+            System.getProperties().load(new StringReader(before));
+            System.setProperty("tamaya.defaults.disable", "");
+            environmentSource = new EnvironmentPropertySource();
+            assertFalse(environmentSource.isDisabled());
+            
+        }finally{
+            System.getProperties().clear();
+            System.getProperties().load(new StringReader(before));
+        }
+    }
+    
+    @Test
+    public void testDisabled() {
+        
+    }
 
     @Test
     public void testGetOrdinal() throws Exception {
@@ -54,8 +106,8 @@ public class EnvironmentPropertySourceTest {
     @Test
     public void testGetProperties() throws Exception {
         Map<String, PropertyValue> props = envPropertySource.getProperties();
-        for(Map.Entry<String,PropertyValue> en: props.entrySet()){
-            if(!en.getKey().startsWith("_")){
+        for (Map.Entry<String, PropertyValue> en : props.entrySet()) {
+            if (!en.getKey().startsWith("_")) {
                 assertEquals(System.getenv(en.getKey()), en.getValue().getValue());
             }
         }
