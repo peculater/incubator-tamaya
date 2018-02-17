@@ -43,6 +43,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
 
 public class SimplePropertySourceTest {
+
     @Test
     public void successfulCreationWithPropertiesFromXMLPropertiesFile() {
         URL resource = getClass().getResource("/valid-properties.xml");
@@ -68,7 +69,7 @@ public class SimplePropertySourceTest {
         }
 
         assertThat(catchedException.getMessage(), allOf(startsWith("Error loading properties from"),
-                                                        endsWith("non-xml-properties.xml")));
+                endsWith("non-xml-properties.xml")));
     }
 
     @Test
@@ -83,9 +84,8 @@ public class SimplePropertySourceTest {
         }
 
         assertThat(catchedException.getMessage(), allOf(startsWith("Error loading properties from"),
-                                                        endsWith("invalid-properties.xml")));
+                endsWith("invalid-properties.xml")));
     }
-
 
     @Test
     public void successfulCreationWithPropertiesFromSimplePropertiesFile() {
@@ -96,37 +96,37 @@ public class SimplePropertySourceTest {
         assertThat(source, notNullValue());
         assertThat(source.getProperties(), aMapWithSize(5)); // double the size for .source values.
     }
-    
+
     @Test
     public void testWithMap() {
         Map<String, String> propertyFirst = new HashMap<>();
         propertyFirst.put("firstKey", "firstValue");
-        
+
         SimplePropertySource source = new SimplePropertySource("testWithMap", propertyFirst, 166);
         assertEquals("testWithMap", source.getName());
         assertEquals(166, source.getDefaultOrdinal());
         assertTrue(source.getProperties().containsKey("firstKey"));
-        
+
     }
-    
-        @Test
+
+    @Test
     public void builder() throws Exception {
         assertNotNull(SimplePropertySource.newBuilder());
         assertNotEquals(SimplePropertySource.newBuilder(), SimplePropertySource.newBuilder());
     }
-    
-        @Test
+
+    @Test
     public void getOrdinal() throws Exception {
         SimplePropertySource ps1 = SimplePropertySource.newBuilder()
                 .withUuidName()
                 .withOrdinal(55)
                 .withDefaultOrdinal(166)
                 .build();
-        
+
         assertEquals(55, ps1.getOrdinal());
         assertEquals(166, ps1.getDefaultOrdinal());
     }
-    
+
     @Test
     public void getName() throws Exception {
         //SimplePropertySource ps1 = SimplePropertySource.newBuilder()
@@ -145,7 +145,7 @@ public class SimplePropertySourceTest {
                 .withProperty("a", "b").build();
         assertEquals("b", ps1.get("a").getValue());
     }
-    
+
     @Test
     public void getProperties() throws Exception {
         SimplePropertySource ps1 = SimplePropertySource.newBuilder()
@@ -156,38 +156,37 @@ public class SimplePropertySourceTest {
         assertEquals(1, ps1.getProperties().size());
         assertEquals("b", ps1.getProperties().get("a").getValue());
     }
-    
+
     @Test
     public void testScannable() {
         SimplePropertySource sps = SimplePropertySource.newBuilder().withUuidName().build();
         assertTrue(sps.isScannable());
     }
-    
-    
+
     @Test
     public void testBuilderWithMaps() {
         URL resource = getClass().getResource("/valid-properties.xml");
         File resourceAsFile = new File(resource.getPath());
-        
+
         Map<String, String> propertyFirst = new HashMap<>();
         propertyFirst.put("firstKey", "firstValue");
-        
+
         SimplePropertySource sps = SimplePropertySource.newBuilder()
                 .withUuidName()
                 .withProperties(propertyFirst)
                 .withProperties(resource)
                 .build();
-        
+
         assertEquals("firstValue", sps.get("firstKey").getValue());
         assertThat(sps.getProperties(), hasEntry("a", PropertyValue.of("a", "b", resource.toString())));
         assertThat(sps.getProperties(), hasEntry("b", PropertyValue.of("b", "1", resource.toString())));
-        
+
         sps = SimplePropertySource.newBuilder()
                 .withUuidName()
                 .withProperties(propertyFirst)
                 .withProperties(resourceAsFile)
                 .build();
-        
+
         assertEquals("firstValue", sps.get("firstKey").getValue());
         assertThat(sps.getProperties(), hasEntry("a", PropertyValue.of("a", "b", resource.toString())));
         assertThat(sps.getProperties(), hasEntry("b", PropertyValue.of("b", "1", resource.toString())));
