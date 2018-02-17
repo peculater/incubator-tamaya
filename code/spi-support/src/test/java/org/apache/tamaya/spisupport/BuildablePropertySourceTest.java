@@ -124,7 +124,7 @@ public class BuildablePropertySourceTest {
         ps2 = BuildablePropertySource.builder()
                 .withName("test2").build();
         assertNotEquals(ps1, ps2);
-        assertNotEquals(null, ps2);
+        assertNotEquals(ps2, null);
         assertNotEquals(ps1, "aString");
     }
 
