@@ -107,7 +107,7 @@ public class EnvironmentPropertySourceTest {
     @Test
     public void testPrefixedGet() throws Exception {
         EnvironmentPropertySource localEnvironmentPropertySource = new EnvironmentPropertySource("fancyprefix");
-        localEnvironmentPropertySource.setPropertiesProvider(new mockedSystemPropertiesProvider());
+        localEnvironmentPropertySource.setPropertiesProvider(new MockedSystemPropertiesProvider());
         assertEquals("fancyprefix.somekey.value", localEnvironmentPropertySource.get("somekey").getValue());
     }
 
@@ -139,7 +139,7 @@ public class EnvironmentPropertySourceTest {
         assertTrue(envPropertySource.isScannable());
     }
     
-    private class mockedSystemPropertiesProvider extends EnvironmentPropertySource.SystemPropertiesProvider {
+    private class MockedSystemPropertiesProvider extends EnvironmentPropertySource.SystemPropertiesProvider {
         @Override
         String getenv(String key) {
             System.out.println("Called with key " + key);
