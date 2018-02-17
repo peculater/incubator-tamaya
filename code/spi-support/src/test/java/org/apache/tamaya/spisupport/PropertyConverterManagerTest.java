@@ -161,10 +161,26 @@ public class PropertyConverterManagerTest {
     }
 
     @Test
-    public void testCreateDefaultPropertyConverter() {
+    public void testBoxedConverterMapping() {
+        PropertyConverterManager manager = new PropertyConverterManager(true);
+        List<PropertyConverter<Integer>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(int.class)));
+        assertThat(converters, hasSize(1));
+
+        PropertyConverter<Integer> converter = converters.get(0);
+        Integer result = converter.convert("101", DUMMY_CONTEXT);
+
+        assertThat(result, notNullValue());
+        assertThat(result, instanceOf(Integer.class));
+        assertThat(result, equalTo(101));
+    }
+
+    
+    @Test
+    public void testCreateEnumPropertyConverter() {
         PropertyConverterManager manager = new PropertyConverterManager(false);
         PropertyConverter pc = manager.createDefaultPropertyConverter(TypeLiteral.of(MyEnum.class));
         assertTrue(pc instanceof EnumConverter);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(MyEnum.class)));
     }
 
     @Test
