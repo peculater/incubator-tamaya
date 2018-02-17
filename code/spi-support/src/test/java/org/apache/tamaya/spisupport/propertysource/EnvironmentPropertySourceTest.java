@@ -21,14 +21,13 @@ package org.apache.tamaya.spisupport.propertysource;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import org.apache.tamaya.spisupport.propertysource.EnvironmentPropertySource;
 import org.apache.tamaya.spi.PropertyValue;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.Properties;
 
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  * Tests for {@link EnvironmentPropertySource}.
@@ -38,57 +37,58 @@ public class EnvironmentPropertySourceTest {
     private final EnvironmentPropertySource envPropertySource = new EnvironmentPropertySource();
 
     @Test
-    public void testConstructionProperties() throws IOException {
+    public void testConstructionPropertiesAndDisabledBehavior() throws IOException {
+        EnvironmentPropertySource localEnvironmentPropertySource;
         StringWriter stringBufferWriter = new StringWriter();
         System.getProperties().store(stringBufferWriter, null);
         String before = stringBufferWriter.toString();
-        
-        try{
-            EnvironmentPropertySource environmentSource = new EnvironmentPropertySource();
-            assertFalse(environmentSource.isDisabled());
-            
+
+        try {
+            assertFalse(envPropertySource.isDisabled());
+
             System.setProperty("tamaya.envprops.prefix", "fakeprefix");
             System.setProperty("tamaya.envprops.disable", "true");
-            environmentSource = new EnvironmentPropertySource();
+            localEnvironmentPropertySource = new EnvironmentPropertySource();
             //assertEquals("fakeprefix", environmentSource.getPrefix());
-            assertTrue(environmentSource.isDisabled());
-            assertNull(environmentSource.get(System.getenv().entrySet().iterator().next().getKey()));
-            assertTrue(environmentSource.getName().contains("(disabled)"));
-            assertTrue(environmentSource.getProperties().isEmpty());
-            assertTrue(environmentSource.toString().contains("disabled=true"));
-            
+            assertTrue(localEnvironmentPropertySource.isDisabled());
+            assertNull(localEnvironmentPropertySource.get(System.getenv().entrySet().iterator().next().getKey()));
+            assertTrue(localEnvironmentPropertySource.getName().contains("(disabled)"));
+            assertTrue(localEnvironmentPropertySource.getProperties().isEmpty());
+            assertTrue(localEnvironmentPropertySource.toString().contains("disabled=true"));
+
             System.getProperties().clear();
             System.getProperties().load(new StringReader(before));
             System.setProperty("tamaya.defaults.disable", "true");
-            environmentSource = new EnvironmentPropertySource();
-            assertTrue(environmentSource.isDisabled());
-            
+            localEnvironmentPropertySource = new EnvironmentPropertySource();
+            assertTrue(localEnvironmentPropertySource.isDisabled());
+
             System.getProperties().clear();
             System.getProperties().load(new StringReader(before));
             System.setProperty("tamaya.envprops.disable", "");
-            environmentSource = new EnvironmentPropertySource();
-            assertFalse(environmentSource.isDisabled());
-            
+            localEnvironmentPropertySource = new EnvironmentPropertySource();
+            assertFalse(localEnvironmentPropertySource.isDisabled());
+
             System.getProperties().clear();
             System.getProperties().load(new StringReader(before));
             System.setProperty("tamaya.defaults.disable", "");
-            environmentSource = new EnvironmentPropertySource();
-            assertFalse(environmentSource.isDisabled());
-            
-        }finally{
+            localEnvironmentPropertySource = new EnvironmentPropertySource();
+            assertFalse(localEnvironmentPropertySource.isDisabled());
+
+        } finally {
             System.getProperties().clear();
             System.getProperties().load(new StringReader(before));
         }
-    }
-    
-    @Test
-    public void testDisabled() {
-        
     }
 
     @Test
     public void testGetOrdinal() throws Exception {
         assertEquals(EnvironmentPropertySource.DEFAULT_ORDINAL, envPropertySource.getOrdinal());
+        EnvironmentPropertySource constructorSetOrdinal22 = new EnvironmentPropertySource(22);
+        assertEquals(22, constructorSetOrdinal22.getOrdinal());
+
+        EnvironmentPropertySource constructorSetOrdinal16 = new EnvironmentPropertySource("sixteenprefix", 16);
+        assertEquals(16, constructorSetOrdinal16.getOrdinal());
+
     }
 
     @Test
@@ -102,6 +102,14 @@ public class EnvironmentPropertySourceTest {
             assertEquals(envPropertySource.get(envEntry.getKey()).getValue(), envEntry.getValue());
         }
     }
+    
+    @Ignore
+    @Test
+    public void testPrefixedGet() throws Exception {
+        EnvironmentPropertySource localEnvironmentPropertySource = new EnvironmentPropertySource("fancyprefix");
+        localEnvironmentPropertySource.setPropertiesProvider(new mockedSystemPropertiesProvider());
+        assertEquals("fancyprefix.somekey.value", localEnvironmentPropertySource.get("somekey").getValue());
+    }
 
     @Test
     public void testGetProperties() throws Exception {
@@ -114,7 +122,28 @@ public class EnvironmentPropertySourceTest {
     }
 
     @Test
+    public void testPrefixedGetProperties() throws Exception {
+        EnvironmentPropertySource localEnvironmentPropertySource = new EnvironmentPropertySource("someprefix");
+        Map<String, PropertyValue> props = localEnvironmentPropertySource.getProperties();
+        for (Map.Entry<String, PropertyValue> en : props.entrySet()) {
+            assertTrue(en.getKey().startsWith("someprefix"));
+            String thisKey = en.getKey().replaceFirst("someprefix", "");
+            if (!thisKey.startsWith("_")) {
+                assertEquals(System.getenv(thisKey), en.getValue().getValue());
+            }
+        }
+    }
+
+    @Test
     public void testIsScannable() throws Exception {
         assertTrue(envPropertySource.isScannable());
+    }
+    
+    private class mockedSystemPropertiesProvider extends EnvironmentPropertySource.SystemPropertiesProvider {
+        @Override
+        String getenv(String key) {
+            System.out.println("Called with key " + key);
+            return key + ".value";
+        }
     }
 }
