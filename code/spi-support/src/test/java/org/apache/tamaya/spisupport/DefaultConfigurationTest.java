@@ -23,13 +23,10 @@ import org.apache.tamaya.TypeLiteral;
 import org.apache.tamaya.spi.*;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import org.mockito.Mockito;
 
 public class DefaultConfigurationTest {
 
@@ -215,61 +212,6 @@ public class DefaultConfigurationTest {
         assertEquals(config1.hashCode(), config2.hashCode());
         assertNotEquals(config1.hashCode(), config3.hashCode());
         assertTrue(config1.toString().contains("Configuration{"));
-    }
-
-    private static class MockedPropertySource implements PropertySource {
-
-        private String name = "MockedPropertySource";
-
-        @Override
-        public int getOrdinal() {
-            return 10;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public PropertyValue get(String key) {
-            if (key.contains("Null")) {
-                return PropertyValue.of(key, null, "MockedPropertySource");
-            }
-            return PropertyValue.of(key, "valueFromMockedPropertySource", "MockedPropertySource");
-        }
-
-        @Override
-        public Map<String, PropertyValue> getProperties() {
-            Map<String, PropertyValue> returnable = new HashMap<>();
-            returnable.put("shouldBeNull", get("shouldBeNull"));
-            returnable.put("Filterednull", get("shouldBeFiltered"));
-            returnable.put("someKey", get("someKey"));
-
-            return returnable;
-        }
-
-        @Override
-        public boolean isScannable() {
-            return true;
-        }
-
-    }
-
-    private static class MockedPropertyFilter implements PropertyFilter {
-
-        @Override
-        public PropertyValue filterProperty(PropertyValue value, FilterContext context) {
-            if (value.getKey().contains("Filternull")) {
-                return null;
-            } else {
-                return value;
-            }
-        }
     }
 
     public static class DummyConfigurationContext implements ConfigurationContext {
