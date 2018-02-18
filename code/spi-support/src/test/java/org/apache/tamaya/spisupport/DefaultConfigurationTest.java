@@ -18,16 +18,18 @@
  */
 package org.apache.tamaya.spisupport;
 
+import java.util.Arrays;
 import org.apache.tamaya.TypeLiteral;
 import org.apache.tamaya.spi.*;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
+import org.mockito.Mockito;
 
 public class DefaultConfigurationTest {
 
@@ -62,6 +64,14 @@ public class DefaultConfigurationTest {
         c.get("a", (TypeLiteral<?>) null);
     }
 
+    @Test
+    public void getReturnsNullOrNotAsAppropriate() {
+        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
+        assertNotNull(c.get("valueOfValid"));
+        assertNull(c.get("valueOfNull"));
+        assertNull(c.get("Filternull")); //get does apply filtering
+    }
+
     /**
      * Tests for getOrDefault(String, Class, String)
      */
@@ -70,13 +80,6 @@ public class DefaultConfigurationTest {
         DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
 
         c.getOrDefault(null, String.class, "ok");
-    }
-
-    @Test
-    public void getOrDefaultDoesAcceptNullAsDefaultValueForThreeParameterVariant() {
-        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
-
-        assertNull(c.getOrDefault("a", String.class, null));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -98,10 +101,11 @@ public class DefaultConfigurationTest {
     }
 
     @Test
-    public void getOrDefaultDoesAcceptNullAsDefaultValueForThreeParameterVariantSecondIsTypeLiteral() {
+    public void getOrDefaultDoesAcceptNullAsDefaultValueForThreeParameterVariant() {
         DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
 
-        assertNull(c.getOrDefault("a", TypeLiteral.of(String.class), null));
+        assertNotNull(c.getOrDefault("a", String.class, null));
+        assertNotNull(c.getOrDefault("a", TypeLiteral.of(String.class), null));
     }
 
     @Test(expected = NullPointerException.class)
@@ -124,7 +128,48 @@ public class DefaultConfigurationTest {
     @Test
     public void getOrDefaultDoesAcceptNullAsDefaultValueForTwoParameterVariantDefaultValueIsSecond() {
         DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
-        assertNull(c.getOrDefault("a", null));
+        assertNotNull(c.getOrDefault("a", null));
+    }
+
+    @Test
+    public void getOrDefaultReturnDefaultIfValueWouldHaveBeenNull() {
+        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
+        assertEquals("ok", c.getOrDefault("valueOfNull", "ok"));
+        assertEquals("ok", c.getOrDefault("valueOfNull", String.class, "ok"));
+        assertEquals("ok", c.getOrDefault("valueOfNull", TypeLiteral.of(String.class), "ok"));
+    }
+
+    /**
+     * Tests for evaluateRawValue(String)
+     */
+    @Test
+    public void evaluateRawValueReturnsNullOrNotAsAppropriate() {
+        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
+        assertNotNull(c.evaluteRawValue("valueOfValid"));
+        assertNull(c.evaluteRawValue("valueOfNull"));
+        assertNotNull(c.evaluteRawValue("Filternull")); //evaluateRawValue does not apply filtering
+    }
+
+    /**
+     * Tests for getProperties()
+     */
+    @Test
+    public void getPropertiesReturnsNullOrNotAsAppropriate() {
+        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
+        Map<String, String> result = c.getProperties();
+        assertEquals("valueFromMockedPropertySource", result.get("someKey"));
+        assertNull(result.get("notInThePropertiesMock"));
+        assertNull(result.get("valueOfNull"));
+        assertNull(result.get("Filternull"));
+    }
+
+    /**
+     * Tests for convertValue(String key, String value, TypeLiteral<T> type)
+     */
+    @Test
+    public void testConvertValue() {
+        DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
+        assertTrue(100 == (Integer) c.convertValue("aHundred", "100", TypeLiteral.of(Integer.class)));
     }
 
     @Test(expected = NullPointerException.class)
@@ -152,52 +197,132 @@ public class DefaultConfigurationTest {
         DefaultConfiguration c = new DefaultConfiguration(new DummyConfigurationContext());
         assertEquals(c.query(config -> "testQ"), "testQ");
     }
+    
+    @Test
+    public void testEqualsAndHashAndToStringValues() {
+        ConfigurationContext sharedContext = new DummyConfigurationContext();
+        DefaultConfiguration config1 = new DefaultConfiguration(sharedContext);
+        DefaultConfiguration config2 = new DefaultConfiguration(sharedContext);
+        DefaultConfiguration config3 = new DefaultConfiguration(new DummyConfigurationContext());
+
+        assertEquals(config1, config1);
+        assertNotEquals(null, config1);
+        assertNotEquals(sharedContext, config1);
+        assertNotEquals(config1, sharedContext);
+        assertNotEquals("aString", config1);
+        assertEquals(config1, config2);
+        assertNotEquals(config1, config3);
+        assertEquals(config1.hashCode(), config2.hashCode());
+        assertNotEquals(config1.hashCode(), config3.hashCode());
+        assertTrue(config1.toString().contains("Configuration{"));
+    }
+
+    private static class MockedPropertySource implements PropertySource {
+
+        private String name = "MockedPropertySource";
+
+        @Override
+        public int getOrdinal() {
+            return 10;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public PropertyValue get(String key) {
+            if (key.contains("Null")) {
+                return PropertyValue.of(key, null, "MockedPropertySource");
+            }
+            return PropertyValue.of(key, "valueFromMockedPropertySource", "MockedPropertySource");
+        }
+
+        @Override
+        public Map<String, PropertyValue> getProperties() {
+            Map<String, PropertyValue> returnable = new HashMap<>();
+            returnable.put("shouldBeNull", get("shouldBeNull"));
+            returnable.put("Filterednull", get("shouldBeFiltered"));
+            returnable.put("someKey", get("someKey"));
+
+            return returnable;
+        }
+
+        @Override
+        public boolean isScannable() {
+            return true;
+        }
+
+    }
+
+    private static class MockedPropertyFilter implements PropertyFilter {
+
+        @Override
+        public PropertyValue filterProperty(PropertyValue value, FilterContext context) {
+            if (value.getKey().contains("Filternull")) {
+                return null;
+            } else {
+                return value;
+            }
+        }
+    }
 
     public static class DummyConfigurationContext implements ConfigurationContext {
 
+        PropertyConverterManager pcm = new PropertyConverterManager(false);
+        
+        public DummyConfigurationContext() {
+            pcm.register(TypeLiteral.of(Integer.class), new IntegerTestConverter());
+        }
+        
         @Override
         public void addPropertySources(PropertySource... propertySources) {
-            throw new RuntimeException("Method should be never called in this test");
+            throw new RuntimeException("addPropertySources should be never called in this test");
         }
 
         @Override
         public List<PropertySource> getPropertySources() {
-            return Collections.emptyList();
+            return Arrays.asList(new MockedPropertySource());
         }
 
         @Override
         public PropertySource getPropertySource(String name) {
-            throw new RuntimeException("Method should be never called in this test");
+            return new MockedPropertySource();
         }
 
         @Override
         public <T> void addPropertyConverter(TypeLiteral<T> type, PropertyConverter<T> propertyConverter) {
-            throw new RuntimeException("Method should be never called in this test");
+            throw new RuntimeException("addPropertyConverter should be never called in this test");
         }
 
         @Override
         public Map<TypeLiteral<?>, List<PropertyConverter<?>>> getPropertyConverters() {
-            return Collections.emptyMap();
+            return pcm.getPropertyConverters();
         }
-
+   
         @Override
         public <T> List<PropertyConverter<T>> getPropertyConverters(TypeLiteral<T> type) {
-            return Collections.emptyList();
+            return pcm.getPropertyConverters(type);
         }
 
         @Override
         public List<PropertyFilter> getPropertyFilters() {
-            return Collections.emptyList();
+            return Arrays.asList(new MockedPropertyFilter());
         }
 
         @Override
         public PropertyValueCombinationPolicy getPropertyValueCombinationPolicy() {
-            throw new RuntimeException("Method should be never called in this test");
+            return PropertyValueCombinationPolicy.DEFAULT_OVERRIDING_POLICY;
         }
 
         @Override
         public ConfigurationContextBuilder toBuilder() {
-            throw new RuntimeException("Method should be never called in this test");
+            throw new RuntimeException("toBuilder should be never called in this test");
         }
     }
 }
