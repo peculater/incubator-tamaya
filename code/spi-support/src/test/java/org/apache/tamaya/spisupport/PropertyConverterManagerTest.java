@@ -67,6 +67,7 @@ public class PropertyConverterManagerTest {
     @Test
     public void testDirectConverterMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(C.class)));
         List<PropertyConverter<C>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(C.class)));
         assertThat(converters, hasSize(1));
 
@@ -81,6 +82,7 @@ public class PropertyConverterManagerTest {
     @Test
     public void testDirectSuperclassConverterMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(B.class)));
         List<PropertyConverter<B>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(B.class)));
         assertThat(converters, hasSize(1));
         converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(B.class)));
@@ -97,6 +99,7 @@ public class PropertyConverterManagerTest {
     @Test
     public void testMultipleConverterLoad() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(B.class)));
         List<PropertyConverter<B>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(B.class)));
         assertThat(converters, hasSize(1));
         manager = new PropertyConverterManager(true);
@@ -107,6 +110,7 @@ public class PropertyConverterManagerTest {
     @Test
     public void testTransitiveSuperclassConverterMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(A.class)));
         List<PropertyConverter<A>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(A.class)));
         assertThat(converters, hasSize(1));
 
@@ -121,6 +125,7 @@ public class PropertyConverterManagerTest {
     @Test
     public void testDirectInterfaceMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(Readable.class)));
         List<PropertyConverter<Readable>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(Readable.class)));
         assertThat(converters, hasSize(1));
 
@@ -135,6 +140,7 @@ public class PropertyConverterManagerTest {
     @Test
     public void testTransitiveInterfaceMapping1() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(Runnable.class)));
         List<PropertyConverter<Runnable>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(Runnable.class)));
         assertThat(converters, hasSize(1));
 
@@ -149,6 +155,7 @@ public class PropertyConverterManagerTest {
     @Test
     public void testTransitiveInterfaceMapping2() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(AutoCloseable.class)));
         List<PropertyConverter<AutoCloseable>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(AutoCloseable.class)));
         assertThat(converters, hasSize(1));
 
@@ -163,6 +170,8 @@ public class PropertyConverterManagerTest {
     @Test
     public void testBoxedConverterMapping() {
         PropertyConverterManager manager = new PropertyConverterManager(true);
+        assertFalse(manager.isTargetTypeSupported(TypeLiteral.of(int.class)));
+        assertTrue(manager.isTargetTypeSupported(TypeLiteral.of(Integer.class)));
         List<PropertyConverter<Integer>> converters = List.class.cast(manager.getPropertyConverters(TypeLiteral.of(int.class)));
         assertThat(converters, hasSize(1));
 
