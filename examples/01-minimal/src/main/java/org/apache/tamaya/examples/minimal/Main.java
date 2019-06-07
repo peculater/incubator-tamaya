@@ -33,7 +33,7 @@ import static java.lang.String.format;
  *
  * <p>
  *  Without any additional configuration Tamaya allows you access via
- *  {@link ConfigurationProvider#getConfiguration} all configuration values.
+ *  {@link Configuration#current} all configuration values.
  *  Accessable are all system environment properties, all system properties,
  *  and all properties which are found in {@code /META-INF/javaconfiguration.properties}
  *  or {@code /META-INF/javaconfiguration.xml}.
