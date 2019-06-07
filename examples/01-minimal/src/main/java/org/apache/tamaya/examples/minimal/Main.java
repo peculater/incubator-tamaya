@@ -19,7 +19,6 @@
 package org.apache.tamaya.examples.minimal;
 
 import org.apache.tamaya.Configuration;
-import org.apache.tamaya.ConfigurationProvider;
 
 import java.io.PrintStream;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Configuration cfg = ConfigurationProvider.getConfiguration();
+        Configuration cfg = Configuration.current();
 
         System.out.println("****************************************************");
         System.out.println("Minimal Example");
